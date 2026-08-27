@@ -1,20 +1,28 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import BackButton from "@/components/BackButton";
 
 export default function MasterAdmin() {
     const [usuarios, setUsuarios] = useState<any[]>([]);
+    const [stats, setStats] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
     const carregarDados = async () => {
         try {
-            const res = await fetch("/api/admin/usuarios");
-            const data = await res.json();
+            const [resU, resS] = await Promise.all([
+                fetch("/api/admin/usuarios"),
+                fetch("/api/admin/stats"),
+            ]);
+            const data = await resU.json();
+            const dataStats = await resS.json();
             setUsuarios(data);
-            setLoading(false);
+            setStats(dataStats);
         } catch (e) {
-            console.error("Erro ao carregar usuários");
+            console.error("Erro ao carregar dados");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -79,24 +87,48 @@ export default function MasterAdmin() {
                         <h1 className="text-4xl font-black text-[#004587] italic tracking-tighter uppercase">Master Root</h1>
                         <p className="text-slate-500 font-bold text-sm">GESTÃO DE INFRAESTRUTURA HUMANA</p>
                     </div>
-                    <div className="bg-white px-6 py-2 rounded-2xl shadow-sm border border-slate-100 text-right">
+<div className="bg-white px-6 py-2 rounded-2xl shadow-sm border border-slate-100 text-right">
                         <span className="block text-[10px] font-black text-slate-400 uppercase">Cidadãos Ativos</span>
                         <span className="text-2xl font-black text-[#004587]">{usuarios.length}</span>
                     </div>
                 </header>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+<div className="flex justify-end gap-3 mb-6">
+                    <Link href="/gastos" className="bg-yellow-400 text-blue-900 px-5 py-3 rounded-2xl font-black text-sm shadow-lg hover:bg-yellow-300 transition">
+                        💰 Transparência de Gastos
+                    </Link>
+                    <Link href="/perfil" className="bg-[#004587] text-white px-5 py-3 rounded-2xl font-black text-sm shadow-lg hover:bg-[#003566] transition">
+                        👤 Meu Perfil
+                    </Link>
+                </div>
+
+<div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
                     <div className="bg-[#004587] p-6 rounded-[2rem] text-white shadow-xl shadow-blue-200">
                         <p className="text-[10px] font-black opacity-60 uppercase">Total de Relatórios</p>
-                        <p className="text-4xl font-black italic">128</p>
+                        <p className="text-4xl font-black italic">{stats?.total ?? 0}</p>
                     </div>
                     <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/50">
                         <p className="text-[10px] font-black text-slate-400 uppercase italic">Problemas Resolvidos</p>
-                        <p className="text-4xl font-black text-green-600 italic">85%</p>
+                        <p className="text-4xl font-black text-green-600 italic">{stats?.porcentagem ?? 0}%</p>
                     </div>
                     <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/50">
-                        <p className="text-[10px] font-black text-slate-400 uppercase italic">Tempo de Resposta</p>
-                        <p className="text-4xl font-black text-[#004587] italic">48h</p>
+                        <p className="text-[10px] font-black text-slate-400 uppercase italic">Concluídos</p>
+                        <p className="text-4xl font-black text-[#004587] italic">{stats?.resolvidos ?? 0}</p>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                    <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/50">
+                        <p className="text-[10px] font-black text-slate-400 uppercase italic">Aguardando</p>
+                        <p className="text-4xl font-black text-yellow-500 italic">{stats?.aguardando ?? 0}</p>
+                    </div>
+                    <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/50">
+                        <p className="text-[10px] font-black text-slate-400 uppercase italic">Em Análise (Vistos)</p>
+                        <p className="text-4xl font-black text-blue-600 italic">{stats?.visto ?? 0}</p>
+                    </div>
+                    <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/50">
+                        <p className="text-[10px] font-black text-slate-400 uppercase italic">Gastos Registrados</p>
+                        <p className="text-4xl font-black text-[#004587] italic">{stats?.totalGastos ?? 0}</p>
                     </div>
                 </div>
 

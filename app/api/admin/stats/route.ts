@@ -3,12 +3,18 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    // Conta o total de casos
+    // Total de requerimentos
     const total: any = await query({ query: "SELECT COUNT(*) as count FROM issues" });
-    // Conta apenas os resolvidos
-    const resolvidos: any = await query({ query: "SELECT COUNT(*) as count FROM issues WHERE status = 'Resolvido'" });
-    // Conta os em aberto
-    const abertos: any = await query({ query: "SELECT COUNT(*) as count FROM issues WHERE status = 'Aberto'" });
+    // Concluídos
+    const resolvidos: any = await query({ query: "SELECT COUNT(*) as count FROM issues WHERE status = 'Concluido'" });
+    // Em aguardando
+    const aguardando: any = await query({ query: "SELECT COUNT(*) as count FROM issues WHERE status = 'Aguardando'" });
+    // Em visto
+    const visto: any = await query({ query: "SELECT COUNT(*) as count FROM issues WHERE status = 'Visto'" });
+    // Total de cidadãos (usuários)
+    const cidadaos: any = await query({ query: "SELECT COUNT(*) as count FROM users" });
+    // Total de gastos registrados
+    const gastos: any = await query({ query: "SELECT COUNT(*) as count FROM gastos" });
 
     const totalCount = total[0].count;
     const resolvidosCount = resolvidos[0].count;
@@ -17,8 +23,11 @@ export async function GET() {
     return NextResponse.json({
       total: totalCount,
       resolvidos: resolvidosCount,
-      abertos: abertos[0].count,
-      porcentagem: porcentagem
+      aguardando: aguardando[0].count,
+      visto: visto[0].count,
+      porcentagem: porcentagem,
+      cidadaos: cidadaos[0].count,
+      totalGastos: gastos[0].count,
     });
   } catch (error) {
     return NextResponse.json({ error: "Erro ao buscar stats" }, { status: 500 });

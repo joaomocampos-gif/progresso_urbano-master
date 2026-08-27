@@ -105,6 +105,42 @@ CREATE TABLE IF NOT EXISTS activity_logs (
     REFERENCES users(id) ON DELETE SET NULL
 );
 
+-- ------------------------------------------------------------
+-- Tabela: gastos
+-- Transparência de gastos públicos registrados pelos políticos
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS gastos (
+  id VARCHAR(36) NOT NULL PRIMARY KEY,
+  titulo VARCHAR(255) NOT NULL,
+  descricao TEXT NULL,
+  valor DECIMAL(12, 2) NOT NULL,
+  categoria ENUM('obras', 'infraestrutura', 'saude', 'educacao', 'seguranca', 'outros') NOT NULL DEFAULT 'outros',
+  data_gasto DATE NOT NULL,
+  registrado_por VARCHAR(36) NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_gastos_user FOREIGN KEY (registrado_por)
+    REFERENCES users(id) ON DELETE SET NULL
+);
+
+CREATE INDEX idx_gastos_categoria ON gastos (categoria);
+
+-- ------------------------------------------------------------
+-- Tabela: noticias
+-- Notícias publicadas pelos políticos e exibidas na landing page
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS noticias (
+  id VARCHAR(36) NOT NULL PRIMARY KEY,
+  titulo VARCHAR(255) NOT NULL,
+  conteudo TEXT NOT NULL,
+  categoria VARCHAR(50) NOT NULL DEFAULT 'geral',
+  autor_id VARCHAR(36) NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_noticias_user FOREIGN KEY (autor_id)
+    REFERENCES users(id) ON DELETE SET NULL
+);
+
+CREATE INDEX idx_noticias_created ON noticias (created_at);
+
 -- ============================================================
 -- DADOS INICIAIS (opcional)
 -- Cria o usuário Master Root padrão (login: admin@progresso.com)

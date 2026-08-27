@@ -22,12 +22,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Senha incorreta" }, { status: 401 });
     }
 
-    // Retorna os dados do usuário, incluindo o ROLE atualizado
+// Retorna os dados do usuário, incluindo username, foto e ROLE
     return NextResponse.json({ 
       user: { 
         id: users[0].id, 
         nome: users[0].full_name, 
-        role: users[0].role // Aqui ele lerá 'super_admin'
+        username: users[0].username, 
+        email: users[0].email,
+        foto: users[0].foto, 
+        role: users[0].role, // Aqui ele lerá 'super_admin'
+        cidade: users[0].city
       } 
     });
 
